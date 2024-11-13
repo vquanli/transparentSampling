@@ -30,7 +30,7 @@ if len(args) == 0:
     print("Hint: To print the table in LaTeX code, add the option -l.")
     sys.exit(-1)
 
-datasize = int(args[0]) * 8000000
+datasize = float(args[0]) * 8000000
 
 # Print to LaTeX
 tex = "-l" in opts
@@ -43,13 +43,15 @@ else:
 # Generate and append rows for each scheme
 schemes = [
     ("Naive", makeNaiveScheme(datasize)),
-    ("Merkle", makeMerkleScheme(datasize)),
+    # ("Merkle", makeMerkleScheme(datasize)),
     ("RS", makeKZGScheme(datasize)),
-    ("Tensor", makeTensorScheme(datasize)),
-    ("Hash", makeHashBasedScheme(datasize)),
-    ("HomHash", makeHomHashBasedScheme(datasize)),
-    ("FRI", makeFRIScheme(datasize)),
-     ("LT", makeLT_KZGScheme(datasize))
+    # ("Tensor", makeTensorScheme(datasize)),
+    # ("Hash", makeHashBasedScheme(datasize)),
+    # ("HomHash", makeHomHashBasedScheme(datasize)),
+    # ("FRI", makeFRIScheme(datasize)),
+     ("LT", makeLTKZGScheme(datasize)),
+    #  ("TensorRSIdentityScheme", makeTensorRSIdentityScheme(datasize)),
+    #  ("TensorLTIdentityScheme", makeTensorLTIdentityScheme(datasize))
 ]
 
 for name, scheme in schemes:

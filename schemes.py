@@ -27,6 +27,7 @@ class Scheme:
         '''
         Compute the total communication in bits.
         '''
+       # print('comm_per_query=',self.comm_per_query(),'self.samples=',self.samples())
         return self.comm_per_query() * self.samples()
 
     def comm_per_query(self):
@@ -43,7 +44,7 @@ class Scheme:
         '''
         Compute the size of the encoding in bits.
         '''
-        print(self.code.codeword_len, self.opening_overhead, self.code.size_code_symbol,self.code.codeword_len * (self.opening_overhead + self.code.size_code_symbol)/8000000000)
+       # print(self.code.codeword_len, self.opening_overhead, self.code.size_code_symbol,self.code.codeword_len * (self.opening_overhead + self.code.size_code_symbol)/8000000000)
         return self.code.codeword_len * (self.opening_overhead + self.code.size_code_symbol)
 
     def reception(self):
@@ -59,10 +60,10 @@ class Scheme:
         return self.code.codeword_len
 
 # Tensor Code Commitment
-def makeTensorScheme(datasize, invrate=2):
+def makeTensorScheme(datasize, invrate=1):
     m = math.ceil(datasize / BLS_FE_SIZE)
     k = math.ceil(math.sqrt(m))
-    # print(datasize,k)
+    # (datasize,k)
     n = invrate * k
     rs = makeRSCode(BLS_FE_SIZE, k, n)
     return Scheme(
@@ -72,11 +73,14 @@ def makeTensorScheme(datasize, invrate=2):
     )
 
 # Hash-Based Code Commitment
-def makeHashBasedScheme(datasize, fsize=32, P=8, L=64, invrate=4):
+def makeHashBasedScheme(datasize, fsize=32, P=8, L=64, invrate=2):
+    
     m = math.ceil(datasize / fsize)
     k = math.ceil(math.sqrt(m))
     n = invrate * k
+    print(k,n)
     rs = makeRSCode(fsize, k, n)
+  
     return Scheme(
         code=rs.interleave(k),
         com_size=n * HASH_SIZE + P * n * fsize + L * k * fsize,
@@ -120,8 +124,9 @@ def makeMerkleScheme(datasize, chunksize=1024):
     )
 
 # KZG Commitment
-def makeKZGScheme(datasize, invrate=2):
+def makeKZGScheme(datasize, invrate=1):
     k = math.ceil(datasize / BLS_FE_SIZE)
+    print(datasize,k)
     # print(datasize,k)
     return Scheme(
         code=makeRSCode(BLS_FE_SIZE, k, invrate * k),
@@ -140,11 +145,13 @@ def makeLTKZGScheme(datasize, invrate=1):
     )
 
 # Tensor Code Commitment with row RS and column identity code scheme
-def makeTensorRSIdentityScheme(datasize, invrate=2):
+def makeTensorRSIdentityScheme(datasize, invrate=1):
+    
     m = math.ceil(datasize / BLS_FE_SIZE)
     k = math.ceil(math.sqrt(m))
     # print(datasize,k)
     n = invrate * k
+
     rs = makeRSCode(BLS_FE_SIZE, k, n)
     tc = makeTrivialCode(BLS_FE_SIZE, k)
     return Scheme(
@@ -158,9 +165,11 @@ def makeTensorRSIdentityScheme(datasize, invrate=2):
 def makeTensorLTIdentityScheme(datasize, invrate=1):
     m = math.ceil(datasize / BLS_FE_SIZE)
     k = math.ceil(math.sqrt(m))
+
     # print(datasize,k)
     n = invrate * k
     tc = makeTrivialCode(BLS_FE_SIZE, k)
+    
     return Scheme(
         code=tc.ltextend(tc),
         # Commit on column wise
