@@ -50,20 +50,27 @@ class Code:
         '''
         reception = codeword_len - row_dist * col_dist + 1
 
-        samples_via_reception = samples_from_reception(SECPAR_SOUND, reception, codeword_len)
-        loge = math.log2(math.e)
-        lognc = math.log2(col.codeword_len)
-        lognr = math.log2(self.codeword_len)
-        logbinomr = (self.reception - 1) * (lognr + loge - math.log2(self.reception - 1))
-        loginnerr = math.log2(1.0 - (self.codeword_len - self.reception + 1) / codeword_len)
-        logbinomc = (col.reception - 1) * (lognc + loge - math.log2(col.reception - 1))
-        loginnerc = math.log2(1.0 - (col.codeword_len - col.reception + 1) / codeword_len)
+        # samples_via_reception = samples_from_reception(SECPAR_SOUND, reception, codeword_len)
+        # loge = math.log2(math.e)
+        # lognc = math.log2(col.codeword_len)
+        # lognr = math.log2(self.codeword_len)
+        # logbinomr = (self.reception - 1) * (lognr + loge - math.log2(self.reception - 1))
+        # loginnerr = math.log2(1.0 - (self.codeword_len - self.reception + 1) / codeword_len)
+        # logbinomc = (col.reception - 1) * (lognc + loge - math.log2(col.reception - 1))
+        # loginnerc = math.log2(1.0 - (col.codeword_len - col.reception + 1) / codeword_len)
 
-        samples_direct_via_rows = int(math.ceil(-(lognc + logbinomr + SECPAR_SOUND) / loginnerr))
-        samples_direct_via_cols = int(math.ceil(-(lognr + logbinomc + SECPAR_SOUND) / loginnerc))
-        samples_direct = min(samples_direct_via_rows, samples_direct_via_cols)
+        # samples_direct_via_rows = int(math.ceil(-(lognc + logbinomr + SECPAR_SOUND) / loginnerr))
+        # samples_direct_via_cols = int(math.ceil(-(lognr + logbinomc + SECPAR_SOUND) / loginnerc))
+        # samples_direct = min(samples_direct_via_rows, samples_direct_via_cols)
 
-        samples = min(samples_direct, samples_via_reception)
+        # samples = min(samples_direct, samples_via_reception)
+
+        # Samples from Monte Carlo simulation
+        # The essence is the same as the formula above, but the specific performance is obtained from the high-volume simulation.
+        # Doubt the coupon bound formula is appropriate
+        samples_via_reception = samples_from_reception(reception/codeword_len, codeword_len)
+        samples = samples_via_reception
+        
         return Code(
             size_msg_symbol=self.size_msg_symbol,
             msg_len=self.msg_len * col.msg_len,
@@ -83,53 +90,25 @@ class Code:
         col_dist = col.codeword_len - col.reception + 1
         codeword_len = self.codeword_len * col.codeword_len
 
-        '''
-        Example:
-        D D | o o
-        D D | o o
-        --- -+---
-        o o | o o
-        o o | o o
-        Where D is the data.
-        The reception is 8, since 7 is not enough to reconstruct:
-        o o | o x
-        o o | o x
-        --- -+---
-        o o | o x
-        x x | x x
-        Given the symbols marked with x, I cannot reconstruct the data.
-        '''
         reception = codeword_len - row_dist * col_dist + 1
-
-        # samples_via_reception = samples_from_reception(SECPAR_SOUND, reception, codeword_len)
-        # loge = math.log2(math.e)
-        # lognc = math.log2(col.codeword_len)
-        # lognr = math.log2(self.codeword_len)
-        # logbinomr = (self.reception - 1) * (lognr + loge - math.log2(self.reception - 1))
-        # loginnerr = math.log2(1.0 - (self.codeword_len - self.reception + 1) / codeword_len)
-        # logbinomc = (col.reception - 1) * (lognc + loge - math.log2(col.reception - 1))
-        # loginnerc = math.log2(1.0 - (col.codeword_len - col.reception + 1) / codeword_len)
-
-        # samples_direct_via_rows = int(math.ceil(-(lognc + logbinomr + SECPAR_SOUND) / loginnerr))
-        # samples_direct_via_cols = int(math.ceil(-(lognr + logbinomc + SECPAR_SOUND) / loginnerc))
-        # samples_direct = min(samples_direct_via_rows, samples_direct_via_cols)
-
-        # samples = min(samples_direct, samples_via_reception)
         
-        # c is a constant and should be lager than 1. 
-        # t=cnm.
-        c = 1.2
-        d=c
+
         n = max(self.codeword_len, col.codeword_len)
         k = min(self.codeword_len, col.codeword_len)
 
-        # samples = c*n*k*ln(k/\delta)
-        samples = c*n*k*math.log(k/(2**(-SECPAR_SOUND)))    
+        # LT sample bound (still has some issues when compare with the coupon bound from the code, and doubt the coupon bound formula is appropriate.)
+        # c is a constant and should be lager than 1. 
+        # t=cnm.
+        # c = 1.2
+        # d=c
+        # samples=n * (k+ c * math.sqrt(k) * math.log(k / (2**(-SECPAR_SOUND)))**2+ d * math.sqrt(k) * math.log(n / k))
+        # print("k=",k,"c * math.sqrt(k) * math.log(k / (2**(-SECPAR_SOUND))) ** 2=",c * math.sqrt(k) * math.log2(k / (2**(-SECPAR_SOUND))),"d * math.sqrt(k) * math.log(n / k)=",d * math.sqrt(k) * math.log(n / k))
 
-        samples=n * (k+ c * math.sqrt(k) * math.log(k / (2**(-SECPAR_SOUND)))**2+ d * math.sqrt(k) * math.log(n / k))
+        # Samples from Monte Carlo simulation
+        # The essence is the same as the formula above, but the specific performance is obtained from the high-volume simulation.
+        samples = n * samples_from_reception_LT(k/n, n) + SECPAR_SOUND
 
-
-        #print("k=",k,"c * math.sqrt(k) * math.log(k / (2**(-SECPAR_SOUND))) ** 2=",c * math.sqrt(k) * math.log2(k / (2**(-SECPAR_SOUND))),"d * math.sqrt(k) * math.log(n / k)=",d * math.sqrt(k) * math.log(n / k))
+        
         return Code(
             size_msg_symbol=self.size_msg_symbol,
             msg_len=self.msg_len * col.msg_len,

@@ -146,14 +146,14 @@ def makeLTKZGScheme(datasize, invrate=1):
 
 # Tensor Code Commitment with row RS and column identity code scheme
 def makeTensorRSIdentityScheme(datasize, invrate=1):
-    
     m = math.ceil(datasize / BLS_FE_SIZE)
     k = math.ceil(math.sqrt(m))
+    
     # print(datasize,k)
     n = invrate * k
-
-    rs = makeRSCode(BLS_FE_SIZE, k, n)
     tc = makeTrivialCode(BLS_FE_SIZE, k)
+    rs = makeRSCode(BLS_FE_SIZE, k, n)
+
     return Scheme(
         code=rs.tensor(tc),
         # Commit on row wise
@@ -161,7 +161,7 @@ def makeTensorRSIdentityScheme(datasize, invrate=1):
         opening_overhead=BLS_GE_SIZE
     )
 
-# Tensor Code Commitment with row LT and column identity code scheme
+# Tensor Code Commitment with row LT sampling and column identity code
 def makeTensorLTIdentityScheme(datasize, invrate=1):
     m = math.ceil(datasize / BLS_FE_SIZE)
     k = math.ceil(math.sqrt(m))
@@ -169,9 +169,10 @@ def makeTensorLTIdentityScheme(datasize, invrate=1):
     # print(datasize,k)
     n = invrate * k
     tc = makeTrivialCode(BLS_FE_SIZE, k)
+    rs = makeRSCode(BLS_FE_SIZE, k, n)
     
     return Scheme(
-        code=tc.ltextend(tc),
+        code=rs.ltextend(tc),
         # Commit on column wise
         com_size=BLS_GE_SIZE * k,
         opening_overhead=BLS_GE_SIZE
