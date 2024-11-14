@@ -60,7 +60,7 @@ class Scheme:
         return self.code.codeword_len
 
 # Tensor Code Commitment
-def makeTensorScheme(datasize, invrate=1):
+def makeTensorScheme(datasize, invrate=2):
     m = math.ceil(datasize / BLS_FE_SIZE)
     k = math.ceil(math.sqrt(m))
     # (datasize,k)
@@ -124,7 +124,7 @@ def makeMerkleScheme(datasize, chunksize=1024):
     )
 
 # KZG Commitment
-def makeKZGScheme(datasize, invrate=1):
+def makeKZGScheme(datasize, invrate=4):
     k = math.ceil(datasize / BLS_FE_SIZE)
  
     # print(datasize,k)
@@ -145,7 +145,7 @@ def makeLTKZGScheme(datasize, invrate=1):
     )
 
 # Tensor Code Commitment with row RS and column identity code scheme
-def makeTensorRSIdentityScheme(datasize, invrate=1):
+def makeTensorRSIdentityScheme(datasize, invrate=2):
     m = math.ceil(datasize / BLS_FE_SIZE)
     k = math.ceil(math.sqrt(m))
     
