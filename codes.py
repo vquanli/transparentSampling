@@ -179,11 +179,11 @@ class Code:
         k = min(self.codeword_len, col.codeword_len)
 
         # samples = c*n*k*ln(k/\delta)
-        samples = c*n*k*math.log(k/(2**(-SECPAR_SOUND)))    
+         
 
-        samples=n * (k+ c * math.sqrt(k) * math.log(k / (2**(-SECPAR_SOUND)))**2+ d * math.sqrt(k) * math.log(n / k))
-
-
+        
+        samples=n * samples_from_reception_LT(SECPAR_SOUND,k,n) + SECPAR_SOUND
+       
         #print("k=",k,"c * math.sqrt(k) * math.log(k / (2**(-SECPAR_SOUND))) ** 2=",c * math.sqrt(k) * math.log2(k / (2**(-SECPAR_SOUND))),"d * math.sqrt(k) * math.log(n / k)=",d * math.sqrt(k) * math.log(n / k))
         return Code(
             size_msg_symbol=self.size_msg_symbol,
@@ -269,19 +269,29 @@ def samples_from_reception(sec_par, reception, codeword_len):
 #     # 返回样本值
 #     return samples[0] 
 
-
-def samples_from_reception_LT(sec_par,reception):
-    if reception <= 0 or sec_par <= 0:
-        raise ValueError("k 和 δ 必须为正数")
-    # print(math.log(reception / 2**(-sec_par)))
-    R=calculate_R(reception,sec_par)
-    H=harmonic_sum_modified(reception/R)
-    samples=reception+R*H+R*math.log(R/(2**(-sec_par)))
-    # print(R)
-    # print(H)
-    # print(samples)
+#2024.11.14.12 lin
+# def samples_from_reception_LT(sec_par,reception):
+#     if reception <= 0 or sec_par <= 0:
+#         raise ValueError("k 和 δ 必须为正数")
+#     # print(math.log(reception / 2**(-sec_par)))
+#     R=calculate_R(reception,sec_par)
+#     H=harmonic_sum_modified(reception/R)
+#     samples=reception+R*H+R*math.log(R/(2**(-sec_par)))
+#     # print(R)
+#     # print(H)
+#     # print(samples)
+#     return samples
+def samples_from_reception_LT(sec_par,k,n):
+    samples=0
+    if k/n==1:
+        samples=k+5.422*math.log(k)-32.139+sec_par
+    elif k/n==0.75:
+        samples_1=k+5.422*math.log(k)-32.139+sec_par
+        samples=0.8617*samples_1 - 20.57+sec_par
+    elif k/n==0.5:
+        samples_1=k+5.422*math.log(k)-32.139+sec_par
+        samples=n=0.7095*samples_1+ 29.541+sec_par
     return samples
-
 # def samples_from_reception_LT(k_n, n):
 #     k_n = float(f"{k_n:.2f}")
 #     df = pd.read_csv(f"./{k_n}/ltcode_bp.csv", header=None)
@@ -367,7 +377,7 @@ def makeLTCode(fsize, k, n):
         # LT code will encode on the fly, s.t. during the sampling, so only the original data need to be stored. Which bring more linear homomorphic operation of KZG. n==k.
         codeword_len=k,
         reception=k,
-        samples=samples_from_reception_LT(SECPAR_SOUND, k)
+        samples=samples_from_reception_LT(SECPAR_SOUND, k,n)
     )
 #=204.94+1.24x+8.85×(10^−6)(x^2)
 # tests
