@@ -179,10 +179,10 @@ class Code:
         k = min(self.codeword_len, col.codeword_len)
 
         # samples = c*n*k*ln(k/\delta)
-         
 
-        
-        samples=n * samples_from_reception_LT(SECPAR_SOUND,k,n) + SECPAR_SOUND
+        # Always sample and recover the whole column, should be larger than the tight bound        
+        # samples=n * samples_from_reception_LT(SECPAR_SOUND,k,n) + SECPAR_SOUND
+        samples = n * samples_from_reception_LT(SECPAR_SOUND,k,k) + d*math.sqrt(k)*math.log(n/k) + SECPAR_SOUND
        
         #print("k=",k,"c * math.sqrt(k) * math.log(k / (2**(-SECPAR_SOUND))) ** 2=",c * math.sqrt(k) * math.log2(k / (2**(-SECPAR_SOUND))),"d * math.sqrt(k) * math.log(n / k)=",d * math.sqrt(k) * math.log(n / k))
         return Code(
