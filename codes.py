@@ -22,8 +22,114 @@ class Code:
             reception=self.reception,
             samples=self.samples
         )
-
     def tensor(self, col):
+        assert self.size_msg_symbol == col.size_msg_symbol
+        assert self.size_code_symbol == col.size_code_symbol
+        assert self.size_msg_symbol == self.size_code_symbol
+
+        row_dist = self.codeword_len - self.reception + 1
+        col_dist = col.codeword_len - col.reception + 1
+        codeword_len = self.codeword_len * col.codeword_len
+
+        '''
+        Example:
+        D D | o o
+        D D | o o
+        --- -+---
+        o o | o o
+        o o | o o
+        Where D is the data.
+        The reception is 8, since 7 is not enough to reconstruct:
+        o o | o x
+        o o | o x
+        --- -+---
+        o o | o x
+        x x | x x
+        Given the symbols marked with x, I cannot reconstruct the data.
+        '''
+        reception = codeword_len - row_dist * col_dist + 1
+
+        samples_via_reception = samples_from_reception(SECPAR_SOUND, reception, codeword_len)
+        loge = math.log2(math.e)
+        lognc = math.log2(col.codeword_len)
+        lognr = math.log2(self.codeword_len)
+        logbinomr = (self.reception - 1) * (lognr + loge - math.log2(self.reception - 1))
+        loginnerr = math.log2(1.0 - (self.codeword_len - self.reception + 1) / codeword_len)
+        logbinomc = (col.reception - 1) * (lognc + loge - math.log2(col.reception - 1))
+        loginnerc = math.log2(1.0 - (col.codeword_len - col.reception + 1) / codeword_len)
+
+        samples_direct_via_rows = int(math.ceil(-(lognc + logbinomr + SECPAR_SOUND) / loginnerr))
+        samples_direct_via_cols = int(math.ceil(-(lognr + logbinomc + SECPAR_SOUND) / loginnerc))
+        samples_direct = min(samples_direct_via_rows, samples_direct_via_cols)
+
+        samples = min(samples_direct, samples_via_reception)
+        return Code(
+            size_msg_symbol=self.size_msg_symbol,
+            msg_len=self.msg_len * col.msg_len,
+            size_code_symbol=self.size_code_symbol,
+            codeword_len=codeword_len,
+            reception=reception,
+            samples=samples
+        )
+    # def tensor(self, col):
+    #     assert self.size_msg_symbol == col.size_msg_symbol
+    #     assert self.size_code_symbol == col.size_code_symbol
+    #     assert self.size_msg_symbol == self.size_code_symbol
+    
+    #     row_dist = self.codeword_len - self.reception + 1
+    #     col_dist = col.codeword_len - col.reception + 1
+    #     codeword_len = self.codeword_len * col.codeword_len
+
+    #     '''
+    #     Example:
+    #     D D | o o
+    #     D D | o o
+    #     --- -+---
+    #     o o | o o
+    #     o o | o o
+    #     Where D is the data.
+    #     The reception is 8, since 7 is not enough to reconstruct:
+    #     o o | o x
+    #     o o | o x
+    #     --- -+---
+    #     o o | o x
+    #     x x | x x
+    #     Given the symbols marked with x, I cannot reconstruct the data.
+    #     '''
+    #     reception = codeword_len - row_dist * col_dist + 1
+
+    #     # samples_via_reception = samples_from_reception(SECPAR_SOUND, reception, codeword_len)
+    #     # loge = math.log2(math.e)
+    #     # lognc = math.log2(col.codeword_len)
+    #     # lognr = math.log2(self.codeword_len)
+    #     # logbinomr = (self.reception - 1) * (lognr + loge - math.log2(self.reception - 1))
+    #     # loginnerr = math.log2(1.0 - (self.codeword_len - self.reception + 1) / codeword_len)
+    #     # logbinomc = (col.reception - 1) * (lognc + loge - math.log2(col.reception - 1))
+    #     # loginnerc = math.log2(1.0 - (col.codeword_len - col.reception + 1) / codeword_len)
+
+    #     # samples_direct_via_rows = int(math.ceil(-(lognc + logbinomr + SECPAR_SOUND) / loginnerr))
+    #     # samples_direct_via_cols = int(math.ceil(-(lognr + logbinomc + SECPAR_SOUND) / loginnerc))
+    #     # samples_direct = min(samples_direct_via_rows, samples_direct_via_cols)
+
+    #     # samples = min(samples_direct, samples_via_reception)
+
+    #     # Samples from Monte Carlo simulation
+    #     # The essence is the same as the formula above, but the specific performance is obtained from the high-volume simulation.
+    #     # Doubt the coupon bound formula is appropriate
+    #     samples_via_reception = samples_from_reception(reception/codeword_len, codeword_len)
+    #     samples = samples_via_reception
+        
+    #     return Code(
+    #         size_msg_symbol=self.size_msg_symbol,
+    #         msg_len=self.msg_len * col.msg_len,
+    #         size_code_symbol=self.size_code_symbol,
+    #         codeword_len=codeword_len,
+    #         reception=reception,
+    #         samples=samples
+    #     )
+
+    # Two dimension LT sampling for identify code and RS code
+    def ltextend(self, col):
         assert self.size_msg_symbol == col.size_msg_symbol
         assert self.size_code_symbol == col.size_code_symbol
         assert self.size_msg_symbol == self.size_code_symbol
@@ -64,51 +170,21 @@ class Code:
         # samples_direct = min(samples_direct_via_rows, samples_direct_via_cols)
 
         # samples = min(samples_direct, samples_via_reception)
-
-        # Samples from Monte Carlo simulation
-        # The essence is the same as the formula above, but the specific performance is obtained from the high-volume simulation.
-        # Doubt the coupon bound formula is appropriate
-        samples_via_reception = samples_from_reception(reception/codeword_len, codeword_len)
-        samples = samples_via_reception
         
-        return Code(
-            size_msg_symbol=self.size_msg_symbol,
-            msg_len=self.msg_len * col.msg_len,
-            size_code_symbol=self.size_code_symbol,
-            codeword_len=codeword_len,
-            reception=reception,
-            samples=samples
-        )
-
-    # Two dimension LT sampling for identify code and RS code
-    def ltextend(self, col):
-        assert self.size_msg_symbol == col.size_msg_symbol
-        assert self.size_code_symbol == col.size_code_symbol
-        assert self.size_msg_symbol == self.size_code_symbol
-
-        row_dist = self.codeword_len - self.reception + 1
-        col_dist = col.codeword_len - col.reception + 1
-        codeword_len = self.codeword_len * col.codeword_len
-
-        reception = codeword_len - row_dist * col_dist + 1
-        
-
+        # c is a constant and should be lager than 1. 
+        # t=cnm.
+        c = 1.2
+        d=c
         n = max(self.codeword_len, col.codeword_len)
         k = min(self.codeword_len, col.codeword_len)
 
-        # LT sample bound (still has some issues when compare with the coupon bound from the code, and doubt the coupon bound formula is appropriate.)
-        # c is a constant and should be lager than 1. 
-        # t=cnm.
-        # c = 1.2
-        # d=c
-        # samples=n * (k+ c * math.sqrt(k) * math.log(k / (2**(-SECPAR_SOUND)))**2+ d * math.sqrt(k) * math.log(n / k))
-        # print("k=",k,"c * math.sqrt(k) * math.log(k / (2**(-SECPAR_SOUND))) ** 2=",c * math.sqrt(k) * math.log2(k / (2**(-SECPAR_SOUND))),"d * math.sqrt(k) * math.log(n / k)=",d * math.sqrt(k) * math.log(n / k))
+        # samples = c*n*k*ln(k/\delta)
+        samples = c*n*k*math.log(k/(2**(-SECPAR_SOUND)))    
 
-        # Samples from Monte Carlo simulation
-        # The essence is the same as the formula above, but the specific performance is obtained from the high-volume simulation.
-        samples = n * samples_from_reception_LT(k/n, n) + SECPAR_SOUND
+        samples=n * (k+ c * math.sqrt(k) * math.log(k / (2**(-SECPAR_SOUND)))**2+ d * math.sqrt(k) * math.log(n / k))
 
-        
+
+        #print("k=",k,"c * math.sqrt(k) * math.log(k / (2**(-SECPAR_SOUND))) ** 2=",c * math.sqrt(k) * math.log2(k / (2**(-SECPAR_SOUND))),"d * math.sqrt(k) * math.log(n / k)=",d * math.sqrt(k) * math.log(n / k))
         return Code(
             size_msg_symbol=self.size_msg_symbol,
             msg_len=self.msg_len * col.msg_len,
@@ -133,43 +209,92 @@ class Code:
             and self.msg_len == self.codeword_len
         )
 
+def samples_from_reception(sec_par, reception, codeword_len):
+    '''
+    Compute the number of samples needed to reconstruct
+    data with probability at least 1 - 2^(-sec_par) based on
+    the reception efficiency and a generalized coupon collector.
+    Note: this may not be the tightest for all schemes (e.g. Tensor).
+    '''
+    # special case: if only one symbol is needed, we are done
+    if reception == 1:
+        return 1
+
+    # special case: if all symbols are needed: just regular coupon collector
+    if reception == codeword_len:
+        n = codeword_len
+        s = math.ceil((n / math.log(math.e, 2)) * (math.log(n, 2) + sec_par))
+        return int(s)
+#     n：代表码字的总符号数。
+# math.log(math.e, 2)：计算自然对数 
+# log2𝑒
+#​
+#  e，它是将自然对数转换为以 2 为底的对数所需的比例因子。数值约为 1.4427。
+# math.log(n, 2)：计算 
+# log2𝑛
+
+#  n，表示以 2 为底的 
+
+# n 的对数，是衡量收集 
+
+# n 个不同符号所需的样本量的主要成分。
+# sec_par：安全参数，用于调整所需的样本数，使数据重建的失败概率降低到 
+# 2−sec_par
+#  。这是一个额外的偏移量，确保样本数足够大以满足安全需求。
+# math.ceil()：向上取整函数，确保样本数是整数。
+    # generalized coupon collector
+    delta = reception - 1
+    c = delta / codeword_len
+    s = math.ceil(-sec_par / math.log2(c) + (1.0 - math.log(math.e, c)) * delta)
+# -sec_par / math.log2(c)：
+# 这一项用于计算为了达到预期的安全性（即低失败概率），在 c 比例下所需的样本数。
+# math.log2(c) 是以 2 为底的𝑐的对数。当 𝑐<1 时，该值为负，使得整个分式为正，表示需要更多的样本来确保重建的成功概率。(1.0 - math.log(math.e, c)) * delta：这是一个修正项，用于考虑恢复所需符号的数量。
+# math.log(math.e, c) 是 c 的自然对数（以 e 为底）。
+# 1.0 - math.log(math.e, c) 调整了对 delta 的放大或缩小效果，用于反映在给定比例 c 下恢复数据的难度。
+# math.ceil()：向上取整，确保返回的样本数是整数。这是必要的，因为样本数量必须是整数才能在实际应用中使用。
+    return int(s)
 
 
-def samples_from_reception(k_n, n):
-    k_n = float(f"{k_n:.2f}")
-    df = pd.read_csv(f"./{k_n}/wr.csv", header=None)
-    print('k_n=', k_n, 'n=', n)
-    # 确保第一列数据类型为整数（根据需要）
-    df[0] = df[0].astype(int)
-    # 创建布尔掩码
-    mask = df.iloc[:, 0] == n
-    # 提取对应的样本值
-    samples = df.loc[mask, 1].tolist()
-    print('samples:', samples)
-    # 返回样本值
-    return samples[0] 
-
-
-# def samples_from_reception_LT(k_n, reception):
-#     df = pd.read_csv(f"./{k_n}/ltcode_bp.csv", header=None)
-#     print('k_n=', k_n, 'reception=', reception)
-#     mask = df.iloc[0, :] == reception
+# def samples_from_reception(k_n, n):
+#     k_n = float(f"{k_n:.2f}")
+#     df = pd.read_csv(f"./{k_n}/wr.csv", header=None)
+#     print('k_n=', k_n, 'n=', n)
+#     # 确保第一列数据类型为整数（根据需要）
+#     df[0] = df[0].astype(int)
+#     # 创建布尔掩码
+#     mask = df.iloc[:, 0] == n
+#     # 提取对应的样本值
 #     samples = df.loc[mask, 1].tolist()
-#     print(samples)
-#     return samples[0]
-def samples_from_reception_LT(k_n, n):
-    k_n = float(f"{k_n:.2f}")
-    df = pd.read_csv(f"./{k_n}/ltcode_bp.csv", header=None)
-    print('k_n=', k_n, 'n=', n)
-    # 确保第一列数据类型为整数（根据需要）
-    df[0] = df[0].astype(int)
-    # 创建布尔掩码
-    mask = df.iloc[:, 0] == n
-    # n
-    samples = df.loc[mask, 1].tolist()
-    print('samples:', samples)
-    # 返回样本值
-    return samples[0] 
+#     print('samples:', samples)
+#     # 返回样本值
+#     return samples[0] 
+
+
+def samples_from_reception_LT(sec_par,reception):
+    if reception <= 0 or sec_par <= 0:
+        raise ValueError("k 和 δ 必须为正数")
+    # print(math.log(reception / 2**(-sec_par)))
+    R=calculate_R(reception,sec_par)
+    H=harmonic_sum_modified(reception/R)
+    samples=reception+R*H+R*math.log(R/(2**(-sec_par)))
+    # print(R)
+    # print(H)
+    # print(samples)
+    return samples
+
+# def samples_from_reception_LT(k_n, n):
+#     k_n = float(f"{k_n:.2f}")
+#     df = pd.read_csv(f"./{k_n}/ltcode_bp.csv", header=None)
+#     # print('k_n=', k_n, 'n=', n)
+#     # 确保第一列数据类型为整数（根据需要）
+#     df[0] = df[0].astype(int)
+#     # 创建布尔掩码
+#     mask = df.iloc[:, 0] == n
+#     # n
+#     samples = df.loc[mask, 1].tolist()
+#     # print('samples:', samples)
+#     # 返回样本值
+#     return samples[0] 
 
 
 # def samples_from_reception_LT(k_n, reception):
@@ -212,7 +337,7 @@ def makeTrivialCode(chunksize, k):
         size_code_symbol=chunksize,
         codeword_len=k,
         reception=k,
-        samples=samples_from_reception(k, k)
+        samples=samples_from_reception(SECPAR_SOUND, k, k)
     )
 
 # Reed-Solomon Code
@@ -227,7 +352,7 @@ def makeRSCode(fsize, k, n):
         size_code_symbol=fsize,
         codeword_len=n,
         reception=k,
-        samples=samples_from_reception(k/n, n)
+         samples=samples_from_reception(SECPAR_SOUND, k, n)
     )
 
 # Ludy Transform Code
@@ -242,7 +367,7 @@ def makeLTCode(fsize, k, n):
         # LT code will encode on the fly, s.t. during the sampling, so only the original data need to be stored. Which bring more linear homomorphic operation of KZG. n==k.
         codeword_len=k,
         reception=k,
-        samples=samples_from_reception_LT(k/n, n)
+        samples=samples_from_reception_LT(SECPAR_SOUND, k)
     )
 #=204.94+1.24x+8.85×(10^−6)(x^2)
 # tests

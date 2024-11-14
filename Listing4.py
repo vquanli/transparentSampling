@@ -43,15 +43,15 @@ else:
 # Generate and append rows for each scheme
 schemes = [
     ("Naive", makeNaiveScheme(datasize)),
-    # ("Merkle", makeMerkleScheme(datasize)),
+    ("Merkle", makeMerkleScheme(datasize)),
     ("RS", makeKZGScheme(datasize)),
-    # ("Tensor", makeTensorScheme(datasize)),
-    # ("Hash", makeHashBasedScheme(datasize)),
-    # ("HomHash", makeHomHashBasedScheme(datasize)),
-    # ("FRI", makeFRIScheme(datasize)),
+    ("Tensor", makeTensorScheme(datasize)),
+    ("Hash", makeHashBasedScheme(datasize)),
+    ("HomHash", makeHomHashBasedScheme(datasize)),
+    ("FRI", makeFRIScheme(datasize)),
      ("LT", makeLTKZGScheme(datasize)),
-    #  ("TensorRSIdentityScheme", makeTensorRSIdentityScheme(datasize)),
-    #  ("TensorLTIdentityScheme", makeTensorLTIdentityScheme(datasize))
+     ("TensorRSIdentityScheme", makeTensorRSIdentityScheme(datasize)),
+     ("TensorLTIdentityScheme", makeTensorLTIdentityScheme(datasize))
 ]
 
 for name, scheme in schemes:

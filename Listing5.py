@@ -7,7 +7,9 @@ from schemes import *
 from fri import *
 import numpy as np
 DATASIZEUNIT = 8000000 # Megabytes
-DATASIZERANGE = np.arange(0.049152, 0.098304, 0.006144)
+
+DATASIZERANGE = range(1000000, 25600000, 1500000)
+# DATASIZERANGE = np.arange(0.049152, 0.098304, 0.006144)
 k_n=[1,0.75,0.5]
 non_k_n=["hash","homhash","fri","merkle"]
 def writeCSV(path, d):
@@ -24,9 +26,10 @@ def writeScheme(name, makeScheme):
     commtotal = {}
     encoding = {}
     for kn in k_n:
-        print('kn=',kn)
+    
         for s in DATASIZERANGE:
-            datasize = s * DATASIZEUNIT*kn
+            datasize = s * DATASIZEUNIT
+            print(s)
             if name in non_k_n:
                 scheme = makeScheme(datasize)
             else:
@@ -35,7 +38,7 @@ def writeScheme(name, makeScheme):
             commpq[s] = scheme.comm_per_query() / 8000  # KB
             commtotal[s] = scheme.total_comm() / 8000000000  # GB
             encoding[s] = scheme.encoding_size() / 8000000000  # GB
-            print(commitment[s],s)
+       
         if not os.path.exists("./csvdata/"):
             os.makedirs("./csvdata/")
 
@@ -46,11 +49,11 @@ def writeScheme(name, makeScheme):
     
 # ###########################################
 writeScheme("rs", makeKZGScheme)
-# writeScheme("merkle", makeMerkleScheme)
-# writeScheme("tensor", makeTensorScheme)
-# writeScheme("hash", makeHashBasedScheme)
-# writeScheme("homhash", makeHomHashBasedScheme)
-# writeScheme("fri", makeFRIScheme)
+writeScheme("merkle", makeMerkleScheme)
+writeScheme("tensor", makeTensorScheme)
+writeScheme("hash", makeHashBasedScheme)
+writeScheme("homhash", makeHomHashBasedScheme)
+writeScheme("fri", makeFRIScheme)
 writeScheme("lt", makeLTKZGScheme)
-# writeScheme("tensorRSIdentity", makeTensorRSIdentityScheme)
-# writeScheme("tensorLTIdentity", makeTensorLTIdentityScheme)
+writeScheme("tensorRSIdentity", makeTensorRSIdentityScheme)
+writeScheme("tensorLTIdentity", makeTensorLTIdentityScheme)
