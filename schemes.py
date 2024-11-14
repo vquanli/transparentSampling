@@ -78,7 +78,7 @@ def makeHashBasedScheme(datasize, fsize=32, P=8, L=64, invrate=2):
     m = math.ceil(datasize / fsize)
     k = math.ceil(math.sqrt(m))
     n = invrate * k
-    print(k,n)
+
     rs = makeRSCode(fsize, k, n)
   
     return Scheme(
@@ -126,7 +126,7 @@ def makeMerkleScheme(datasize, chunksize=1024):
 # KZG Commitment
 def makeKZGScheme(datasize, invrate=1):
     k = math.ceil(datasize / BLS_FE_SIZE)
-    print(datasize,k)
+ 
     # print(datasize,k)
     return Scheme(
         code=makeRSCode(BLS_FE_SIZE, k, invrate * k),
