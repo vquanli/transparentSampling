@@ -8,7 +8,7 @@ from fri import *
 import numpy as np
 DATASIZEUNIT = 8000000 # Megabytes
 # DATASIZEUNIT = 80000 # Megabytes
-DATASIZERANGE = np.arange(1, 156, 15)
+DATASIZERANGE = range(1, 156,15 )
 # DATASIZERANGE = np.arange(0.049152, 0.098304, 0.006144)
 # k_n=[1,0.75,0.5]
 non_k_n=["hash","homhash","fri","merkle"]

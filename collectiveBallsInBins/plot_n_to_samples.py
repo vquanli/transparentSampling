@@ -14,15 +14,15 @@ color_list = ['k','deepskyblue','r','k', 'r',
              'palegreen', 'deepskyblue',
              'lightsteelblue', 'navy',
              'blueviolet', 'pink']
-# label_list=['With Replacement','LT Code With Guassian','LT Code With BP']
-label_list=['With Replacement','LT Code']
+label_list=['With Replacement','LT Code With Guassian','LT Code With BP']
+#label_list=['With Replacement','LT Code']
 # Set global font properties to Times New Roman
 plt.rcParams['font.family'] = 'Times New Roman'
 plt.rcParams['font.size'] = 14  # Set default font size for better readability
 # 读取CSV文件
 for floder in files_value :
-    # file_names = ["wr.csv","ltcode_gs.csv","ltcode_bp.csv"]
-    file_names = ["wr.csv","ltcode_gs.csv"]
+    file_names = ["wr.csv","ltcode_gs.csv","ltcode_bp.csv"]
+    #file_names = ["wr.csv","ltcode_gs.csv"]
     plt.figure(figsize=(8, 6))
     i=0
     for file_name in file_names:
@@ -53,7 +53,9 @@ for floder in files_value :
 
 # 设置x轴刻度字体大小
     plt.xticks(fontsize=22)
+    # 调整布局以防止文字被裁剪
+    plt.tight_layout()
     # 保存图像
-    plt.savefig(os.path.join(f'K-N={floder}.pdf'))
+    plt.savefig(os.path.join(f'LTBinBallFigs20250105\K-N={floder}.pdf'))  # 修改这里
     # 显示图形
     plt.show()

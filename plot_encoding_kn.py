@@ -29,14 +29,14 @@ for kn in k_n:
 
     # Plot each dataset with different marker shapes and colors
     plt.plot(fri_com['D'], fri_com['Encoding'], marker='x', linestyle='-', color='red', label='FRI')             # 'x' marker, red color
-    # plt.plot(hash_com['D'], hash_com['Encoding'], marker='o', linestyle='-', color='blue', label='Hash')          # 'o' marker, blue color
+    plt.plot(hash_com['D'], hash_com['Encoding'], marker='o', linestyle='-', color='blue', label='Hash')          # 'o' marker, blue color
     # plt.plot(homhash_com['D'], homhash_com['Encoding'], marker='s', linestyle='-', color='green', label='HomHash') # 's' marker, green color
-    plt.plot(rs_com['D'], rs_com['Encoding'], marker='^', linestyle='-', color='purple', label='RS')              # '^' marker, purple color
+    # plt.plot(rs_com['D'], rs_com['Encoding'], marker='^', linestyle='-', color='purple', label='RS')              # '^' marker, purple color
     plt.plot(tensor_com['D'], tensor_com['Encoding'], marker='d', linestyle='-', color='orange', label='Tensor')  # 'd' marker, orange color
     # plt.plot(lt_com['D'], lt_com['Encoding'], marker='p', linestyle='-', color='brown', label='LT')               # 'p' marker, brown color
     plt.plot(tensorRSIdentity_com['D'], tensorRSIdentity_com['Encoding'], marker='h', linestyle='-', color='cyan', label='Tensor RS Identity') # 'h' marker, cyan color
     plt.plot(tensorLTIdentity_com['D'], tensorLTIdentity_com['Encoding'], marker='*', linestyle='-', color='magenta', label='Tensor LT Identity') # '*' marker, magenta color
-    plt.plot(merkle_com['D'], merkle_com['Encoding'], marker='p', linestyle='-', color='brown', label='Merkle') 
+    # plt.plot(merkle_com['D'], merkle_com['Encoding'], marker='p', linestyle='-', color='brown', label='Merkle') 
     # Set the style of the plot
     plt.xlabel('D = |data| [MB]')
     plt.ylabel('Encoding [GB]')

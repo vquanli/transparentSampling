@@ -24,28 +24,33 @@ merkle_com.columns = ['D', 'Commitment']
 tensorRSIdentity_com.columns = ['D', 'Commitment']
 tensorLTIdentity_com.columns = ['D', 'Commitment']
 
+# Set global font properties to Times New Roman
+plt.rcParams['font.family'] = 'Times New Roman'
+plt.rcParams['font.size'] = 14  # Set default font size
+
 # Plotting the data
-plt.figure(figsize=(12, 8))
+plt.figure(figsize=(8, 6))
 
 # Plot each dataset with different marker shapes and colors
-plt.plot(fri_com['D'], fri_com['Commitment'], marker='x', linestyle='-', color='red', label='FRI')             # 'x' marker, red color
-# plt.plot(hash_com['D'], hash_com['Commitment'], marker='o', linestyle='-', color='blue', label='Hash')          # 'o' marker, blue color
+plt.plot(fri_com['D'], fri_com['Commitment'], marker='d', linestyle='-', color='blue', label='FRIDA')             # 'x' marker, red color
+plt.plot(hash_com['D'], hash_com['Commitment'], marker='^', linestyle='-', color='green', label='Hash')          # 'o' marker, blue color
 # plt.plot(homhash_com['D'], homhash_com['Commitment'], marker='s', linestyle='-', color='green', label='HomHash') # 's' marker, green color
-plt.plot(rs_com['D'], rs_com['Commitment'], marker='^', linestyle='-', color='purple', label='RS')              # '^' marker, purple color
-plt.plot(tensor_com['D'], tensor_com['Commitment'], marker='d', linestyle='-', color='orange', label='Tensor')  # 'd' marker, orange color
+# plt.plot(rs_com['D'], rs_com['Commitment'], marker='^', linestyle='-', color='purple', label='RS')              # '^' marker, purple color
+plt.plot(tensor_com['D'], tensor_com['Commitment'], marker='x', linestyle='-', color='red', label='Tensor', markeredgewidth=2)      # Change line to dashed
 # plt.plot(lt_com['D'], lt_com['Commitment'], marker='p', linestyle='-', color='brown', label='LT')               # 'p' marker, brown color
-plt.plot(tensorRSIdentity_com['D'], tensorRSIdentity_com['Commitment'], marker='h', linestyle='-', color='cyan', label='Tensor RS Identity') # 'h' marker, cyan color
-plt.plot(tensorLTIdentity_com['D'], tensorLTIdentity_com['Commitment'], marker='*', linestyle='-', color='magenta', label='Tensor LT Identity') # '*' marker, magenta color
-plt.plot(merkle_com['D'], merkle_com['Commitment'], marker='p', linestyle='-', color='brown', label='Merkle')   
+# plt.plot(tensorRSIdentity_com['D'], tensorRSIdentity_com['Commitment'], marker='h', linestyle='-', color='cyan', label='Tensor RS Identity') # 'h' marker, cyan color
+plt.plot(tensorLTIdentity_com['D'], tensorLTIdentity_com['Commitment'], linestyle='-', color='#614099', label='TDAS', markerfacecolor='none') # Change shape to hollow circle
+# plt.plot(merkle_com['D'], merkle_com['Commitment'], marker='p', linestyle='-', color='brown', label='Merkle')   
+
 # Set the style of the plot
-plt.xlabel('D = |data| [MB]')
-plt.ylabel('Commitment [MB]')
-# plt.title(f'{kn}')  # Update the title dynamically for each plot
+# plt.xlabel('D = |data| [MB]', fontsize=18)  # Increase font size for x label
+plt.xlabel('N/K',fontsize=18)
+plt.ylabel('Commitment [MB]', fontsize=18)  # Increase font size for y label
+plt.xticks(fontsize=22)  # Increase font size for x-axis ticks
+plt.yticks(fontsize=22)  # Increase font size for y-axis ticks
 plt.grid(True, linestyle='--', alpha=0.5)
-plt.legend()
+plt.legend(fontsize=18)  # Increase font size for legend
 plt.tight_layout()
-
-
 
 # Save the plot and show it
 plt.savefig('figs/com_comparison_plot.pdf')
