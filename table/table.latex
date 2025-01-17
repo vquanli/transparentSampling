@@ -1,0 +1,42 @@
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath}
+\begin{document}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{l c c c c}
+        \toprule
+        \textbf{Scheme} & \textbf{Commitment [KB]} & \textbf{Encoding [MB]} & \textbf{Per Query [KB]} & \textbf{Total [MB]} \\
+        \midrule
+        \multicolumn{5}{c}{$D = 1\ \text{MB}$} \\
+        Naive & 0.03 & 1.00 & 1000.00 & 1.00 \\
+        Merkle & 0.03 & 4.25 & 0.55 & 156.40 \\
+        Tensor & 6.96 & 8.07 & 0.10 & 15.70 \\
+        Hash & 256.00 & 4.00 & 2.00 & 1.76 \\
+        FRIDA & 255.10 & 17.56 & 2.15 & 7.60 \\
+        TDAS & 6.96& 2.02 & 0.10 & 2.55 \\
+        \midrule
+        \multicolumn{5}{c}{$D = 32\ \text{MB}$} \\
+        Naive & 0.03 & 32.00 & 32000.00 & 32.00 \\
+        Merkle & 0.03 & 176.00 & 0.71 & 7089.80 \\
+        Tensor & 39.22 & 256.32 & 0.10 & 456.52 \\
+        Hash & 1448.45 & 128.05 & 11.32 & 55.32 \\
+        FRIDA & 464.83 & 1031.80 & 3.94 & 444.34 \\
+        TDAS & 39.22& 64.08 & 0.10 & 69.25 \\
+        \midrule
+        \multicolumn{5}{c}{$D = 128\ \text{MB}$} \\
+        Naive & 0.03 & 128.00 & 128000.00 & 128.00 \\
+        Merkle & 0.03 & 768.00 & 0.77 & 32007.29 \\
+        Tensor & 78.38 & 1024.01 & 0.10 & 1807.95 \\
+        Hash & 2896.38 & 512.03 & 22.63 & 220.78 \\
+        FRIDA & 495.81 & 4395.63 & 4.19 & 1892.81 \\
+        TDAS & 78.38& 256 & 0.10 & 270.85 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison of different schemes for varying values of $D$}
+    \label{tab:scheme_comparison}
+\end{table}
+
+\end{document}
